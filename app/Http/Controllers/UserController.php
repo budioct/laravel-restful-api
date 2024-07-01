@@ -96,4 +96,17 @@ class UserController extends Controller
 
     }
 
+    public function logout(Request $request): JsonResponse
+    {
+        $user = Auth::user(); // mengambil data user yang saat ini sedang login
+        $user->token = null; // token update null
+        $user->save();
+
+        return response()
+            ->json([
+                "data" => true
+            ])->setStatusCode(200);
+
+    }
+
 }
