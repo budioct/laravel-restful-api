@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ContactCreateRequest;
 use App\Http\Resources\ContactResource;
 use App\Models\Contact;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,4 +27,30 @@ class ContactController extends Controller
             ->setStatusCode(201);
 
     }
+
+    public function getDetail(int $id): ContactResource
+    {
+        $user = Auth::user();
+
+        // sql: select * from `contacts` where `id` = ? and `user_id` = ? limit 1
+        $contact = Contact::query()
+            ->where("id", "=", $id)
+            ->where("user_id", "=", $user->id)
+            ->first();
+
+        // check apakah data ada, jika tidak ada akan exception
+        if (!$contact) {
+            throw new HttpResponseException(response([
+                "errors" => [
+                    "message" => [
+                        "not found"
+                    ]
+                ]
+            ], 404));
+        }
+
+        return new ContactResource($contact);
+
+    }
+
 }
