@@ -24,8 +24,11 @@ Route::post("/users/login", [\App\Http\Controllers\UserController::class, "login
 // middleware: user boleh akses setiap endpoint dengan syarat sudah login, dan hak akses token
 Route::middleware(\App\Http\Middleware\ApiAuthMiddleware::class)->group(function (){
 
+    // user
    Route::get("/users/current", [\App\Http\Controllers\UserController::class, "getList"]);
    Route::patch("/users/current", [\App\Http\Controllers\UserController::class, "update"]);
    Route::delete("/users/logout", [\App\Http\Controllers\UserController::class, "logout"]);
 
+   // contact
+    Route::post("/contacts", [\App\Http\Controllers\ContactController::class, "create"]);
 });

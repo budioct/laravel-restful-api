@@ -10,6 +10,7 @@ select * from users;
 
 describe contacts;
 show create table contacts;
+select * from contacts;
 
 describe addresses;
 show create table addresses;
