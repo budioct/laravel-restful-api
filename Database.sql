@@ -6,6 +6,7 @@ use belajar_laravel_restful_api;
 
 describe users;
 show create table users;
+select * from users;
 
 describe contacts;
 show create table contacts;
