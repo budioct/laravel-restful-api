@@ -14,6 +14,7 @@ class User extends Model
     public $incrementing = true; // attribute $incrementing type data PK auto_increment ketika data di tambah
     public $timestamps = true; // attribute $timestamps implementasi created_at dan updated_at dari laravel
 
+    // relasi 1 to M
     public function contacts(): HasMany
     {
         return $this->hasMany(Contact::class, "user_id", "id"); // hasMany(Model_Relasi, FK_On_contants, PK_on_users) // relasi 1 to M

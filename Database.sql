@@ -9,3 +9,6 @@ show create table users;
 
 describe contacts;
 show create table contacts;
+
+describe addresses;
+show create table addresses;
