@@ -18,14 +18,14 @@ class UserSeeder extends Seeder
             'username' => 'test',
             'password' => Hash::make('test'),
             'name' => 'test',
-            'token' => 'test',
+            'token' => 'test', // token ini yang akan digunakan sebagai token akses Authorization di setiap endpoint
         ]);
 
         User::create([
             'username' => 'test2',
             'password' => Hash::make('test2'),
             'name' => 'test2',
-            'token' => 'test2'
+            'token' => 'test2' // token ini yang akan digunakan sebagai token akses Authorization di setiap endpoint
         ]);
     }
 }

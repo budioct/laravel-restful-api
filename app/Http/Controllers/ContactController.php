@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ContactCreateRequest;
 use App\Http\Requests\ContactUpdateRequest;
+use App\Http\Resources\ContactCollection;
 use App\Http\Resources\ContactResource;
 use App\Models\Contact;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -112,6 +114,44 @@ class ContactController extends Controller
             "data" => true,
         ])->setStatusCode(200);
 
+    }
+
+    public function search(Request $request): ContactCollection
+    {
+        $user = Auth::user(); // mengambil data user yang saat ini sedang login
+
+        // get value dari http web atau http api // lewat query param, form-data, dan request body
+        $page = $request->input("page", 1); // input(key, nilai_default_jika_tidak_di_set_client) // get value dari http request
+        $size = $request->input("size", 10);
+
+        // sql: select * from `contacts `user_id` = ? limit 1
+        $contacts = Contact::query()->where("user_id", $user->id);
+
+        // buat builder search gunakan like query
+        $contacts = $contacts->where(function (Builder $builder) use ($request) {
+
+            $name = $request->input("name");
+            if ($name) {
+                $builder->where(function (Builder $builder) use ($name) {
+                    $builder->orWhere("first_name", "like", "%" . $name . "%");
+                    $builder->orWhere("last_name", "like", "%" . $name . "%");
+                });
+            }
+
+            $email = $request->input("email");
+            if ($email) {
+                $builder->where("email", "like", "%" . $email . "%");
+            }
+
+            $phone = $request->input("phone");
+            if ($phone) {
+                $builder->where("phone", "like", "%" . $phone . "%");
+            }
+        });
+
+        $contacts = $contacts->paginate(perPage: $size, page: $page); // buat pagination
+
+        return new ContactCollection($contacts);
     }
 
 }
