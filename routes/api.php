@@ -20,3 +20,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::post("/users", [\App\Http\Controllers\UserController::class, "register"]);
 Route::post("/users/login", [\App\Http\Controllers\UserController::class, "login"]);
+
+// middleware: user boleh akses setiap endpoint dengan syarat sudah login, dan hak akses token
+Route::middleware(\App\Http\Middleware\ApiAuthMiddleware::class)->group(function (){
+
+   Route::get("/users/current", [\App\Http\Controllers\UserController::class, "getList"]);
+
+});

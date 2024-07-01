@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class User extends Model
+class User extends Model implements Authenticatable
 {
     protected $table = "users"; // attribute $table binding model dengan table db
     protected $primaryKey = "id"; // attribute $primaryKey PK dari table db
@@ -27,4 +28,38 @@ class User extends Model
         return $this->hasMany(Contact::class, "user_id", "id"); // hasMany(Model_Relasi, FK_On_contants, PK_on_users) // relasi 1 to M
     }
 
+    // getAuthIdentifierName() // ingin tahu kira kira Identifier Name atau id untuk user itu apa
+    public function getAuthIdentifierName()
+    {
+        return $this->username; // ambil dari column username
+    }
+
+    // getAuthIdentifier() // username nya itu siapa
+    public function getAuthIdentifier()
+    {
+
+       return $this->username; // ambil dari column username
+    }
+
+    // getAuthPassword // mendapatkan value passwordnya
+    public function getAuthPassword()
+    {
+        $this->password; // ambil dari column password
+    }
+
+    // dibawah ini digunakan untuk OAuth2
+    public function getRememberToken()
+    {
+        return $this->token;
+    }
+
+    public function setRememberToken($value)
+    {
+        return $this->token = $value;
+    }
+
+    public function getRememberTokenName()
+    {
+        return "token";
+    }
 }
