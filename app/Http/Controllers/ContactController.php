@@ -31,7 +31,7 @@ class ContactController extends Controller
 
     public function getDetail(int $id): ContactResource
     {
-        $user = Auth::user();
+        $user = Auth::user(); // mengambil data user yang saat ini sedang login
 
         // sql: select * from `contacts` where `id` = ? and `user_id` = ? limit 1
         $contact = Contact::query()
@@ -56,7 +56,7 @@ class ContactController extends Controller
 
     public function update(int $id, ContactUpdateRequest $request): ContactResource
     {
-        $user = Auth::user();
+        $user = Auth::user(); // mengambil data user yang saat ini sedang login
 
         // sql: select * from `contacts` where `id` = ? and `user_id` = ? limit 1
         $contact = Contact::query()
@@ -81,6 +81,36 @@ class ContactController extends Controller
         $contact->save();
 
         return new ContactResource($contact);
+
+    }
+
+    public function delete(int $id): JsonResponse
+    {
+        $user = Auth::user(); // mengambil data user yang saat ini sedang login
+
+        // sql: select * from `contacts` where `id` = ? and `user_id` = ? limit 1
+        $contact = Contact::query()
+            ->where("id", "=", $id)
+            ->where("user_id", "=", $user->id)
+            ->first();
+
+        // check apakah data ada, jika tidak ada akan exception
+        if (!$contact) {
+            throw new HttpResponseException(response([
+                "errors" => [
+                    "message" => [
+                        "not found"
+                    ]
+                ]
+            ], 404));
+        }
+
+        $contact->delete();
+
+        return response()
+            ->json([
+            "data" => true,
+        ])->setStatusCode(200);
 
     }
 

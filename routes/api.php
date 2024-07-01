@@ -33,4 +33,5 @@ Route::middleware(\App\Http\Middleware\ApiAuthMiddleware::class)->group(function
     Route::post("/contacts", [\App\Http\Controllers\ContactController::class, "create"]);
     Route::get("/contacts/{id}", [\App\Http\Controllers\ContactController::class, "getDetail"])->where("id", "[0-9]+");  // contacts/{id:[0-9]+} // {id:[0-9]+} // regex wajib number positif
     Route::put("/contacts/{id}", [\App\Http\Controllers\ContactController::class, "update"])->where("id", "[0-9]+");  // contacts/{id:[0-9]+} // {id:[0-9]+} // regex wajib number positif
+    Route::delete("/contacts/{id}", [\App\Http\Controllers\ContactController::class, "delete"])->where("id", "[0-9]+");  // contacts/{id:[0-9]+} // {id:[0-9]+} // regex wajib number positif
 });
