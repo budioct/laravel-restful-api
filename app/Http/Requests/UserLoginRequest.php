@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UserRegisterRequest extends FormRequest
+class UserLoginRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,7 +29,6 @@ class UserRegisterRequest extends FormRequest
         return [
             "username" => ["required", "max:100"],
             "password" => ["required", "max:100"],
-            "name" => ["required", "max:100"],
         ];
     }
 
@@ -40,4 +39,5 @@ class UserRegisterRequest extends FormRequest
             "errors" => $validator->getMessageBag()
         ], 400));
     }
+
 }

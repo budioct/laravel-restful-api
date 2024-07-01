@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
@@ -10,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -38,4 +40,29 @@ class UserController extends Controller
             ->response()->setStatusCode(201);
 
     }
+
+    public function login(UserLoginRequest $request): UserResource
+    {
+        $data = $request->validated(); // validasi
+
+        $user = User::query()->where('username', $data['username'])->first();
+
+        // jika user tidak ada, dan password tidak sama maka beri exception Unauthorization
+        if (!$user || !Hash::check($data["password"], $user->password)){
+            throw new HttpResponseException(response([
+                "errors" => [
+                    "message" => [
+                        "username or password wrong"
+                    ]
+                ]
+            ], 401));
+        }
+
+        $user->token = Str::uuid()->toString(); // set token dengan UUID jika user ada
+        $user->save();
+
+        return new UserResource($user);
+
+    }
+
 }
