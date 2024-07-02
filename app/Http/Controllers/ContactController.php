@@ -21,7 +21,7 @@ class ContactController extends Controller
 
         $user = Auth::user(); // mengambil data user yang saat ini sedang login
 
-        $contact = new Contact($data); // instance
+        $contact = new Contact($data); // instance // binding model/entity dari resource/DTO dengan property $fillable
         $contact->user_id = $user->id; // set user_id (FK) dari id user model
         $contact->save();
 
