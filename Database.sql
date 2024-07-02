@@ -14,3 +14,7 @@ select * from contacts;
 
 describe addresses;
 show create table addresses;
+
+select * from users;
+select * from contacts;
+select * from addresses;
