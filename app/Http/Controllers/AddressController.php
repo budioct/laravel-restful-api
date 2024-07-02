@@ -73,6 +73,23 @@ class AddressController extends Controller
 
     }
 
+    public function getList(int $idContact): JsonResponse
+    {
+        $user = Auth::user(); // mengambil data user yang saat ini sedang login
+
+        $contact = $this->getContact($user, $idContact); // find contact_id (FK) address
+
+        $addresses = Address::query()
+            ->where("contact_id", "=", $contact->id)
+            ->get(); // find contact_id (FK) address. get list collection [{},{}]
+
+        return (AddressResource::collection($addresses)
+            ->response()
+            ->setStatusCode(200)
+        );
+
+    }
+
 
     // function refactor
     private function getContact(User $user, int $idContact): Contact
