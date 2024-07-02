@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AddressCreateRequest;
+use App\Http\Requests\AddressUpdateRequest;
 use App\Http\Resources\AddressResource;
 use App\Models\Address;
 use App\Models\Contact;
+use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,21 +19,7 @@ class AddressController extends Controller
     {
         $user = Auth::user();// mengambil data user yang saat ini sedang login
 
-        $contact = Contact::query()
-            ->where("user_id", "=", $user->id)
-            ->where("id", "=", $idContact)
-            ->first();
-
-        // jika id contact tidak ada maka exception not found 404
-        if (!$contact){
-            throw new HttpResponseException(response()->json([
-                "errors" => [
-                    "message" => [
-                        "not found"
-                    ]
-                ]
-            ], 404));
-        }
+        $contact = $this->getContact($user, $idContact); // find contact_id (FK) address
 
         $data = $request->validated(); // validasi
         $address = new Address($data); // instance // binding model/entity dari resource/DTO dengan property $fillable
@@ -48,39 +36,73 @@ class AddressController extends Controller
     {
         $user = Auth::user(); // mengambil data user yang saat ini sedang login
 
-        $contact = Contact::query()
-            ->where("user_id", "=", $user->id)
+        $contact = $this->getContact($user, $idContact); // find contact_id (FK) address
+        $address = $this->getAddress($contact, $idAddress); // find id (PK) address
+
+        return new AddressResource($address);
+
+    }
+
+    public function update(int $idContact, int $idAddress, AddressUpdateRequest $request): AddressResource
+    {
+        $user = Auth::user(); // mengambil data user yang saat ini sedang login
+
+        $contact = $this->getContact($user, $idContact); // find contact_id (FK) address
+        $address = $this->getAddress($contact, $idAddress); // find id (PK) address
+
+        $data = $request->validated(); // validasi
+
+        $address->fill($data); // fill(attribute) // binding model/entity dari resource/DTO dengan property $fillable
+        $address->save();
+
+        return new AddressResource($address);
+    }
+
+
+    // function refactor
+    private function getContact(User $user, int $idContact): Contact
+    {
+
+        $contact = Contact::
+              where("user_id", "=", $user->id)
             ->where("id", "=", $idContact)
             ->first();
 
         // jika id contact tidak ada maka exception not found 404
-        if (!$contact){
+        if (!$contact) {
             throw new HttpResponseException(response()->json([
                 "errors" => [
                     "message" => [
-                        "not found"
-                    ]
-                ]
-            ], 404));
-        }
-
-        $address = Address::query()
-            ->where("contact_id", "=", $contact->id)
-            ->where("id", "=" , $idAddress)
-            ->first();
-
-        // jika id address tidak ada maka exception not found 404
-        if (!$address){
-            throw new HttpResponseException(response()->json([
-                "errors" => [
-                    "message" => [
-                        "not found"
+                        "contact not found"
                     ]
                 ]
             ])->setStatusCode(404));
         }
 
-        return new AddressResource($address);
+        return $contact;
+
+    }
+
+    // function refactor
+    private function getAddress(Contact $contact, int $idAddress): Address
+    {
+        $address = Address::
+              where('contact_id', $contact->id)
+            ->where('id', $idAddress)
+            ->first();
+
+        // jika id contact tidak ada maka exception not found 404
+        if (!$address) {
+            throw new HttpResponseException(response()->json([
+                'errors' => [
+                    "message" => [
+                        "address not found"
+                    ]
+                ]
+            ])->setStatusCode(404));
+        }
+
+        return $address;
 
     }
 

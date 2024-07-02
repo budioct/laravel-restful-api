@@ -87,7 +87,7 @@ class AddressTest extends TestCase
         )->assertStatus(404)
             ->assertJson([
                 'errors' => [
-                    'message' => ['not found']
+                    'message' => ['contact not found']
                 ]
             ]);
 
@@ -156,7 +156,7 @@ class AddressTest extends TestCase
         ])->assertStatus(404)
             ->assertJson([
                 'errors' => [
-                    'message' => ['not found']
+                    'message' => ['address not found']
                 ]
             ]);
 
@@ -176,10 +176,115 @@ class AddressTest extends TestCase
         ])->assertStatus(404)
             ->assertJson([
                 'errors' => [
-                    'message' => ['not found']
+                    'message' => ['contact not found']
                 ]
             ]);
 
+    }
+
+    public function testUpdateSuccess()
+    {
+        $this->seed([
+            UserSeeder::class,
+            ContactSeeder::class,
+            AddressSeeder::class
+        ]);
+        $address = Address::query()->limit(1)->first();
+
+        $this->put('/api/contacts/' . $address->contact_id . '/addresses/' . $address->id,
+            [
+                'street' => 'update',
+                'city' => 'update',
+                'province' => 'update',
+                'country' => 'update',
+                'postal_code' => '22222'
+            ],
+            [
+                'Authorization' => 'test'
+            ]
+        )->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    'street' => 'update',
+                    'city' => 'update',
+                    'province' => 'update',
+                    'country' => 'update',
+                    'postal_code' => '22222'
+                ]
+            ]);
+
+    }
+
+    public function testUpdateFailed()
+    {
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $address = Address::query()->limit(1)->first();
+
+        $this->put('/api/contacts/' . $address->contact_id . '/addresses/' . $address->id,
+            [
+                'street' => 'update',
+                'city' => 'update',
+                'province' => 'update',
+                'country' => '',
+                'postal_code' => '22222'
+            ],
+            [
+                'Authorization' => 'test'
+            ]
+        )->assertStatus(400)
+            ->assertJson([
+                'errors' => [
+                    'country' => ['The country field is required.']
+                ]
+            ]);
+    }
+
+    public function testUpdateAddressNotFound()
+    {
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $address = Address::query()->limit(1)->first();
+
+        $this->put('/api/contacts/' . $address->contact_id . '/addresses/' . ($address->id + 1),
+            [
+                'street' => 'update',
+                'city' => 'update',
+                'province' => 'update',
+                'country' => 'update',
+                'postal_code' => '22222'
+            ],
+            [
+                'Authorization' => 'test'
+            ]
+        )->assertStatus(404)
+            ->assertJson([
+                'errors' => [
+                    'message' => ['address not found']
+                ]
+            ]);
+    }
+
+    public function testUpdateContactNotFound()
+    {
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $address = Address::query()->limit(1)->first();
+
+        $this->put('/api/contacts/' . ($address->contact_id + 1) . '/addresses/' . $address->id + 1,
+            [
+                'street' => 'update',
+                'city' => 'update',
+                'province' => 'update',
+                'country' => 'update',
+                'postal_code' => '22222'
+            ],
+            [
+                'Authorization' => 'test'
+            ]
+        )->assertStatus(404)
+            ->assertJson([
+                'errors' => [
+                    'message' => ['contact not found']
+                ]
+            ]);
     }
 
 }
