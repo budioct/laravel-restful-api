@@ -44,4 +44,44 @@ class AddressController extends Controller
 
     }
 
+    public function getDetail(int $idContact, int $idAddress): AddressResource
+    {
+        $user = Auth::user(); // mengambil data user yang saat ini sedang login
+
+        $contact = Contact::query()
+            ->where("user_id", "=", $user->id)
+            ->where("id", "=", $idContact)
+            ->first();
+
+        // jika id contact tidak ada maka exception not found 404
+        if (!$contact){
+            throw new HttpResponseException(response()->json([
+                "errors" => [
+                    "message" => [
+                        "not found"
+                    ]
+                ]
+            ], 404));
+        }
+
+        $address = Address::query()
+            ->where("contact_id", "=", $contact->id)
+            ->where("id", "=" , $idAddress)
+            ->first();
+
+        // jika id address tidak ada maka exception not found 404
+        if (!$address){
+            throw new HttpResponseException(response()->json([
+                "errors" => [
+                    "message" => [
+                        "not found"
+                    ]
+                ]
+            ])->setStatusCode(404));
+        }
+
+        return new AddressResource($address);
+
+    }
+
 }
