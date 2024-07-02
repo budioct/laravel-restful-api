@@ -58,6 +58,21 @@ class AddressController extends Controller
         return new AddressResource($address);
     }
 
+    public function delete(int $idContact, int $idAddress): JsonResponse
+    {
+        $user = Auth::user(); // mengambil data user yang saat ini sedang login
+
+        $contact = $this->getContact($user, $idContact); // find contact_id (FK) address
+        $address = $this->getAddress($contact, $idAddress); // find id (PK) address
+
+        $address->delete();
+
+        return response()->json([
+            "data" => true,
+        ])->setStatusCode(200);
+
+    }
+
 
     // function refactor
     private function getContact(User $user, int $idContact): Contact
